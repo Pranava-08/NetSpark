@@ -1,4 +1,2 @@
-customtkinter
-tkinter
-networkx
-webbrowser
+customtkinter -- 5.2.2
+networkx -- 3.3
