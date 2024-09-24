@@ -43,9 +43,13 @@ class DraggableCircle:
         canvas_height = self.canvas.winfo_height()
 
         # Move the circle and text
-        if (self._drag_data["y"] < (canvas_height-25)) and (self._drag_data["x"] < (canvas_width-25)) and (self._drag_data["x"] > 25) and (self._drag_data["y"] >25): 
+        if 25 <= event.x <= canvas_width - 25 and 25 <= event.y <= canvas_height - 25:
             self.canvas.move(self.circle, delta_x, delta_y)
             self.canvas.move(self.text, delta_x, delta_y)
+
+            # Update the relative positions
+            self.relative_x = event.x / canvas_width
+            self.relative_y = event.y / canvas_height
 
         # Update the positions of all lines connected to this circle
         for line, circle1, circle2 in self.connections:
@@ -68,6 +72,28 @@ class DraggableCircle:
         self.connections.append((line, self, other_circle))
         other_circle.connections.append((line, self, other_circle))
 
+    def reposition(self):
+        """Reposition the circle based on the current canvas size and stored relative coordinates."""
+        canvas_width = self.canvas.winfo_width()
+        canvas_height = self.canvas.winfo_height()
+
+        # Calculate new absolute positions based on the relative coordinates
+        x = self.relative_x * canvas_width
+        y = self.relative_y * canvas_height
+
+        # Move the circle and text to the new position
+        self.canvas.coords(self.circle, x - self.radius, y - self.radius, x + self.radius, y + self.radius)
+        self.canvas.coords(self.text, x, y)
+        for line, circle1, circle2 in self.connections:
+            if circle1 == self:
+                self.canvas.coords(line, x, y,
+                                self.canvas.coords(circle2.circle)[0] + self.radius,
+                                self.canvas.coords(circle2.circle)[1] + self.radius)
+            else:
+                self.canvas.coords(line,
+                                self.canvas.coords(circle1.circle)[0] + self.radius,
+                                self.canvas.coords(circle1.circle)[1] + self.radius,
+                                x, y)
 
 class Lines(ctk.CTk):
     def __init__(self):
@@ -144,6 +170,13 @@ class App(ctk.CTk):
 
         # Keep track of circles created
         self.circles = []
+        # Bind the canvas resize event
+        self.canvas.bind("<Configure>", self.on_canvas_resize)
+
+    def on_canvas_resize(self, event):
+        """Handle the canvas resize event to reposition circles."""
+        for circle in self.circles:
+            circle.reposition()
 
     def add_circle(self,label,x,y):
         """Add a new draggable circle to the canvas."""
@@ -177,9 +210,24 @@ class App(ctk.CTk):
         circle2 = next((circle for circle in self.circles if circle.label == circle2_label), None)
 
         if circle1 and circle2:
-            self.lines_manager.draw_edge(self.canvas, circle1, circle2)
+            if circle1 == circle2:
+                self.draw_self_loop(circle2)
+            else:
+                self.lines_manager.draw_edge(self.canvas, circle1, circle2)
 
+    def draw_self_loop(self, circle):
+        """Draw a self-loop above the node."""
+        # Get the current position of the circle
+        x, y = (self.canvas.coords(circle.circle)[0] + circle.radius, self.canvas.coords(circle.circle)[1] - circle.radius)
 
+        # Define loop radius and offset above the node
+        loop_radius = circle.radius // 2
+        offset = circle.radius + 10  # Distance above the node for the loop
+
+        # Create an oval to represent the self-loop
+        self.canvas.create_oval(x - loop_radius, y - offset - loop_radius,
+                                x + loop_radius, y - offset + loop_radius,
+                                outline="black", width=2)
     def clear_canvas(self):
         """Clears all the circles and lines from the canvas."""
         self.canvas.delete("all")  

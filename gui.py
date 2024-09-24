@@ -60,10 +60,12 @@ def add_edge():
         node1_name = entry1.get()
         node2_name = entry2.get()
         if node1_name in G.nodes and node2_name in G.nodes:
-            G.add_edge(node1_name, node2_name)  # Add the edge to the graph
-            print(f"Edge added between: {node1_name} and {node2_name}")
-            
-            visualize.add_line(node1_name,node2_name)
+            if G.has_edge(node1_name, node2_name):
+                print(f"Edge between {node1_name} and {node2_name} already exists.")
+            else:
+                G.add_edge(node1_name, node2_name)  # Add the edge to the graph
+                print(f"Edge added between: {node1_name} and {node2_name}")
+                visualize.add_line(node1_name,node2_name)
         else:
             print("One or both nodes do not exist in the graph.")
         edge_window.destroy()  # Close the add edge window after submission
@@ -131,8 +133,8 @@ def analyse_view():
     canvas_frame = ctk.CTkFrame(
     master=window,
     fg_color=BACKGROUNG_COLOR,  
-    width=600,
-    height=400,
+    width=1600,
+    height=1400,
     corner_radius=0, 
 )
     canvas_frame.place(x=0, y=0)
@@ -188,8 +190,8 @@ def graph_input_view():
     canvas_frame = ctk.CTkFrame(
     master=window,
     fg_color=BACKGROUNG_COLOR,  
-    width=600,
-    height=400,
+    width=1600,
+    height=1400,
     corner_radius=0, 
 )
     canvas_frame.place(x=0, y=0)
@@ -204,7 +206,7 @@ def graph_input_view():
         corner_radius=20,
         command=add_node
     )
-    button_1.place(x=10, y=59)
+    # button_1.place(x=10, y=59)
 
     button_2 = ctk.CTkButton(
         master=window,
@@ -216,7 +218,7 @@ def graph_input_view():
         corner_radius=20,
         command=add_edge
     )
-    button_2.place(x=10, y=148)
+    # button_2.place(x=10, y=148)
 
     button_3 = ctk.CTkButton(
         master=window,
@@ -228,7 +230,7 @@ def graph_input_view():
         corner_radius=20,
         command=reset_graph_button
     )
-    button_3.place(x=10, y=244)
+    # button_3.place(x=10, y=244)
 
     button_4 = ctk.CTkButton(
         master=window,
@@ -240,20 +242,27 @@ def graph_input_view():
         corner_radius=20,
         command=analyse_view
     )
-    button_4.place(x=443, y=332)
+    # button_4.place(x=443, y=332)
+    button_1.place(relx=0.03, rely=0.1)
+    button_2.place(relx=0.03, rely=0.35)
+    button_3.place(relx=0.03, rely=0.60)
+    button_4.place(relx=0.78, rely=0.85)
+
 
     rectangle_frame = ctk.CTkFrame(
         master=window,
         fg_color="#FFFFFF",
         bg_color=BACKGROUNG_COLOR,
-        width=442,
-        height=304,
+        # width=1.7*window.winfo_width(),
+        # height=1.3*window.winfo_height(),
         corner_radius=0
     )
-    rectangle_frame.place(x=143, y=16)
+    rectangle_frame.place(relx=0.25, rely=0.05, relwidth=0.7, relheight=0.78)
+    # rectangle_frame.place(x=143, y=16)
+    # rectangle_frame.place(relx=0.25,rely=0.05)
 
-    display_canvas = tk.Canvas(rectangle_frame, bg="white", width=660, height=450, highlightthickness=0)
-    display_canvas.place(x=0, y=0)
+    display_canvas = tk.Canvas(rectangle_frame, bg="white", highlightthickness=0,)
+    display_canvas.place(x=0, y=0,relwidth=1, relheight=1)
     
     global visualize
     visualize = App(display_canvas)
@@ -275,8 +284,8 @@ def analyse_graph_view():
     canvas_frame = ctk.CTkFrame(
     master=window,
     fg_color=BACKGROUNG_COLOR,  
-    width=600,
-    height=400,
+    width=1600,
+    height=1400,
     corner_radius=0, 
 )
     canvas_frame.place(x=0, y=0)
@@ -285,15 +294,15 @@ def analyse_graph_view():
         master=window,
         fg_color="#FFFFFF",
         bg_color=BACKGROUNG_COLOR,
-        width=442,
-        height=304,
+        # width=442,
+        # height=304,
         corner_radius=0
     )
-    rectangle_frame.place(x=143, y=16)
+    rectangle_frame.place(relx=0.25, rely=0.05, relwidth=0.7, relheight=0.78)
 
 # Create a canvas inside the frame for drawing the graph
-    analyse_canvas = tk.Canvas(rectangle_frame, bg="white", width=660, height=450, highlightthickness=0)
-    analyse_canvas.place(x=0, y=0)
+    analyse_canvas = tk.Canvas(rectangle_frame, bg="white", highlightthickness=0)
+    analyse_canvas.place(x=0, y=0,relwidth=1, relheight=1)
 
     # Dropdown menu for "Cliques" and "Bridges"
     analysis_option = ctk.StringVar(value="Choose Analysis")
@@ -427,8 +436,8 @@ def analyse_node_view():
     canvas_frame = ctk.CTkFrame(
         master=window,
         fg_color=BACKGROUNG_COLOR,  
-        width=600,
-        height=400,
+        width=1600,
+        height=1400,
         corner_radius=0, 
     )
     canvas_frame.place(x=0, y=0)
@@ -438,15 +447,15 @@ def analyse_node_view():
         master=window,
         fg_color="#FFFFFF",
         bg_color=BACKGROUNG_COLOR,
-        width=442,
-        height=304,
+        # width=442,
+        # height=304,
         corner_radius=0
     )
-    rectangle_frame.place(x=143, y=16)
+    rectangle_frame.place(relx=0.25, rely=0.05, relwidth=0.7, relheight=0.78)
 
     # Create a canvas for drawing the graph
-    analyse_canvas = tk.Canvas(rectangle_frame, bg="white", width=660, height=450, highlightthickness=0)
-    analyse_canvas.place(x=0, y=0)
+    analyse_canvas = tk.Canvas(rectangle_frame, bg="white", highlightthickness=0)
+    analyse_canvas.place(x=0, y=0,relwidth=1, relheight=1)
 
     # Dropdown menu for centrality measures
     metric_options = ctk.StringVar(value="Choose Centrality")
@@ -470,7 +479,6 @@ def analyse_node_view():
         command=analyse_view  # Function to go back to the main view
     )
     back_button.place(relx=0.9, rely=0.9, anchor="center")
-
 
 def draw_nodes(canvas, metric):
     """Draw nodes on the canvas and bind clicks to display centrality based on the selected type."""
@@ -546,5 +554,5 @@ def open_wiki_page(url):
 
 graph_input_view()
 
-window.resizable(False, False)
+window.resizable(True, True)
 window.mainloop()
